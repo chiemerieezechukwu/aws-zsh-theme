@@ -22,7 +22,7 @@ function postcmd_newline() {
 }
 
 function get_current_dir() {
-  echo "%{$fg[cyan]%}%c%{$reset_color%}"
+  echo "$(get_seperator) %{$fg[cyan]%}%c%{$reset_color%}"
 }
 
 function virtualenv_info() {
