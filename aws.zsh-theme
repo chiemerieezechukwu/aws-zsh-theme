@@ -25,7 +25,7 @@ function postcmd_newline() {
 }
 
 function get_current_dir() {
-  echo "$(get_seperator) %{$fg[cyan]%}%c%{$reset_color%}"
+  echo "%{$fg[cyan]%}%c%{$reset_color%}"
 }
 
 function virtualenv_info() {
@@ -39,7 +39,7 @@ function aws_profile() {
 }
 
 function get_current_time() {
-  echo "$(matte_grey '%D{%a %b %m %T}') $(get_seperator)"
+  echo "$(matte_grey '%D{%d/%m %T}') $(get_seperator)"
 }
 
 function get_cluster() {
