@@ -4,13 +4,16 @@ _PROMPT_PREFIX_='%B❯%b'
 _PROMPT_STATUS_='%(?:%{$fg_bold[green]%}$_PROMPT_PREFIX_:%{$fg_bold[red]%}$_PROMPT_PREFIX_)'
 _VIRTUALENV_INFO_='$(virtualenv_info)'
 
+ZSH_THEME_K8S_PREFIX="%{$fg_bold[magenta]%}k8s:(%{$fg[yellow]%}"
+ZSH_THEME_K8S_SUFFIX="%{$fg_bold[magenta]%})%{$reset_color%}"
+
 ZSH_THEME_VIRTUALENV_PREFIX="%{$FG[116]%}("
 ZSH_THEME_VIRTUALENV_SUFFIX=") %{$reset_color%}"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
-ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%}) %{$fg[yellow]%}✗"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%}) %{$fg[green]%}✔"
+ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[yellow]%}✗%{$fg[blue]%})"
+ZSH_THEME_GIT_PROMPT_CLEAN=" %{$fg[green]%}✔%{$fg[blue]%})"
 
 function postcmd_newline() {
   # add a newline after every prompt except the first line 
@@ -22,7 +25,7 @@ function postcmd_newline() {
 }
 
 function get_current_dir() {
-  echo "$(get_seperator) %{$fg[cyan]%}%c%{$reset_color%}"
+  echo "%{$fg[cyan]%}%c%{$reset_color%}"
 }
 
 function virtualenv_info() {
@@ -32,11 +35,22 @@ function virtualenv_info() {
 
 function aws_profile() {
   [[ -n ${AWS_PROFILE} ]] || return
-  echo " %{$fg[cyan]%}[aws:${AWS_PROFILE}]%{$reset_color%} $(get_seperator)"
+  echo "$(matte_grey aws:${AWS_PROFILE}) $(get_seperator)"
 }
 
 function get_current_time() {
-  echo "%{$fg[cyan]%}[%D{%d/%m %T}]%{$reset_color%}"
+  echo "$(matte_grey '%D{%d/%m %T}') $(get_seperator)"
+}
+
+function get_cluster() {
+  local current_context=$(kubectl config current-context)
+  if [[ -n $current_context ]] || return
+  if [[ $current_context == *":eks:"* ]]; then
+    local cluster=eks/${current_context#*cluster/}
+  else
+    local cluster=$current_context
+  fi
+  echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX}"
 }
 
 function get_seperator() {
@@ -58,7 +72,7 @@ function get_space() {
 }
 
 function matte_grey() {
-  echo "%{$FG[235]%}$1%{$reset_color%}"
+  echo "%{$FG[240]%}$1%{$reset_color%}"
 }
 
 function prompt_len() {
@@ -79,8 +93,8 @@ function prompt_len() {
 }
 
 function prompt_header() {
-  local left_prompt="$(get_current_dir) $(git_prompt_info)"
-  local right_prompt="$(aws_profile) $(get_current_time) $(top_right_corner)"
+  local left_prompt="$(get_current_dir) $(get_cluster) $(git_prompt_info)"
+  local right_prompt=" $(aws_profile) $(get_current_time)"
   local prompt_len=$(prompt_len $left_prompt$right_prompt)
   local space_size=$(( $COLUMNS - $prompt_len - 1 ))
   local space=$(get_space $space_size)
