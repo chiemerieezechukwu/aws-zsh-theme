@@ -4,8 +4,17 @@ _PROMPT_PREFIX_='%B❯%b'
 _PROMPT_STATUS_='%(?:%{$fg_bold[green]%}$_PROMPT_PREFIX_:%{$fg_bold[red]%}$_PROMPT_PREFIX_)'
 _VIRTUALENV_INFO_='$(virtualenv_info)'
 
-ZSH_THEME_K8S_PREFIX="%{$fg_bold[magenta]%}k8s:(%{$fg[yellow]%}"
-ZSH_THEME_K8S_SUFFIX="%{$fg_bold[magenta]%})%{$reset_color%}"
+ZSH_THEME_K8S_PREFIX="%B$FG[051]%}k8s:(%{$FG[219]%}"
+ZSH_THEME_K8S_SUFFIX="%B$FG[051]%})%{$reset_color%}"
+
+ZSH_THEME_AWS_PREFIX="%B$FG[226]%}aws:(%{$FG[194]%}"
+ZSH_THEME_AWS_SUFFIX="%B$FG[226]%})%{$reset_color%}"
+
+# ZSH_THEME_TIME_PREFIX="%B$FG[039]%}[%{$FG[159]%}"
+# ZSH_THEME_TIME_SUFFIX="%B$FG[039]%}]%{$reset_color%}"
+
+ZSH_THEME_TIME_PREFIX="%B$FG[076]%}"
+ZSH_THEME_TIME_SUFFIX="%{$reset_color%}"
 
 ZSH_THEME_VIRTUALENV_PREFIX="%{$FG[116]%}("
 ZSH_THEME_VIRTUALENV_SUFFIX=") %{$reset_color%}"
@@ -35,11 +44,19 @@ function virtualenv_info() {
 
 function aws_profile() {
   [[ -n ${AWS_PROFILE} ]] || return
-  echo "$(matte_grey aws:${AWS_PROFILE}) $(get_seperator)"
+  echo "${ZSH_THEME_AWS_PREFIX}$AWS_PROFILE${ZSH_THEME_AWS_SUFFIX}"
 }
 
+# function get_current_time() {
+#   echo "$(matte_grey '%D{%d/%m %T}') $(get_seperator)"
+# }
+
+# function get_current_time() {
+#   echo "${ZSH_THEME_TIME_PREFIX}%D{%d/%m %T}${ZSH_THEME_TIME_SUFFIX}"
+# }
+
 function get_current_time() {
-  echo "$(matte_grey '%D{%d/%m %T}') $(get_seperator)"
+  echo "${ZSH_THEME_TIME_PREFIX}%D{%T}${ZSH_THEME_TIME_SUFFIX}"
 }
 
 function get_cluster() {
@@ -50,7 +67,7 @@ function get_cluster() {
   else
     local cluster=$current_context
   fi
-  echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX}"
+  echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX} $(get_seperator)"
 }
 
 function get_seperator() {
@@ -63,12 +80,12 @@ function top_right_corner() {
 
 function get_space() {
   local size=$1
-  local space="—"
+  local space=$(get_seperator)
   while [[ $size -gt 0 ]]; do
-    space="$space—"
+    space="$space$(get_seperator)"
     let size=$size-1
   done
-  echo "$(matte_grey $space)"
+  echo "$space"
 }
 
 function matte_grey() {
@@ -93,8 +110,8 @@ function prompt_len() {
 }
 
 function prompt_header() {
-  local left_prompt="$(get_current_dir) $(get_cluster) $(git_prompt_info)"
-  local right_prompt=" $(aws_profile) $(get_current_time)"
+  local left_prompt="$(get_current_dir) $(git_prompt_info)$(get_current_time) "
+  local right_prompt=" $(get_cluster) $(aws_profile)"
   local prompt_len=$(prompt_len $left_prompt$right_prompt)
   local space_size=$(( $COLUMNS - $prompt_len - 1 ))
   local space=$(get_space $space_size)
