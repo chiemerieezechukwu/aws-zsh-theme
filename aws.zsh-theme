@@ -4,23 +4,23 @@ _PROMPT_PREFIX_='%B❯%b'
 _PROMPT_STATUS_='%(?:%{$fg_bold[green]%}$_PROMPT_PREFIX_:%{$fg_bold[red]%}$_PROMPT_PREFIX_)'
 _VIRTUALENV_INFO_='$(virtualenv_info)'
 
-ZSH_THEME_K8S_PREFIX="%B$FG[051]%}k8s:(%{$FG[219]%}"
+ZSH_THEME_K8S_PREFIX="%B$FG[051]%}♢ k8s:(%{$FG[219]%}"
 ZSH_THEME_K8S_SUFFIX="%B$FG[051]%})%{$reset_color%}"
 
-ZSH_THEME_AWS_PREFIX="%B$FG[226]%}aws:(%{$FG[194]%}"
+ZSH_THEME_AWS_PREFIX="%B$FG[226]%}♢ aws:(%{$FG[194]%}"
 ZSH_THEME_AWS_SUFFIX="%B$FG[226]%})%{$reset_color%}"
 
 # ZSH_THEME_TIME_PREFIX="%B$FG[039]%}[%{$FG[159]%}"
 # ZSH_THEME_TIME_SUFFIX="%B$FG[039]%}]%{$reset_color%}"
 
-ZSH_THEME_TIME_PREFIX="%B$FG[076]%}"
-ZSH_THEME_TIME_SUFFIX="%{$reset_color%}"
+ZSH_THEME_TIME_PREFIX="%B$FG[076]%}["
+ZSH_THEME_TIME_SUFFIX="]%{$reset_color%}"
 
 ZSH_THEME_VIRTUALENV_PREFIX="%{$FG[116]%}("
 ZSH_THEME_VIRTUALENV_SUFFIX=") %{$reset_color%}"
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}git:(%{$fg[red]%}"
-ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%} "
+ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY=" %{$fg[yellow]%}✗%{$fg[blue]%})"
 ZSH_THEME_GIT_PROMPT_CLEAN=" %{$fg[green]%}✔%{$fg[blue]%})"
 
@@ -67,7 +67,8 @@ function get_cluster() {
   else
     local cluster=$current_context
   fi
-  echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX} $(get_seperator)"
+  # echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX} $(get_seperator)"
+  echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX}"
 }
 
 function get_seperator() {
@@ -110,13 +111,14 @@ function prompt_len() {
 }
 
 function prompt_header() {
-  local left_prompt="$(get_current_dir) $(git_prompt_info)$(get_current_time) "
-  local right_prompt=" $(get_cluster) $(aws_profile)"
-  local prompt_len=$(prompt_len $left_prompt$right_prompt)
-  local space_size=$(( $COLUMNS - $prompt_len - 1 ))
-  local space=$(get_space $space_size)
+  local left_prompt="$(get_current_time) $(get_current_dir) $(git_prompt_info) $(aws_profile) $(get_cluster)"
+  # local right_prompt=" $(get_cluster) $(aws_profile)"
+  # local prompt_len=$(prompt_len $left_prompt$right_prompt)
+  # local space_size=$(( $COLUMNS - $prompt_len - 1 ))
+  # local space=$(get_space $space_size)
 
-  print -rP "$left_prompt$space$right_prompt"
+  # print -rP "$left_prompt$space$right_prompt"
+  print -rP "$left_prompt$right_prompt"
 }
 
 postcmd_newline
