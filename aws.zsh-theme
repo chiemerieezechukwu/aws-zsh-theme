@@ -60,14 +60,19 @@ function get_current_time() {
 }
 
 function get_cluster() {
-  local current_context=$(kubectl config current-context)
-  if [[ -n $current_context ]] || return
+  local current_context
+  current_context=$(kubectl config current-context 2>/dev/null) || return
+
+  # If current_context is empty, exit the function
+  [[ -z $current_context ]] && return
+
+  local cluster
   if [[ $current_context == *":eks:"* ]]; then
-    local cluster=eks/${current_context#*cluster/}
+    cluster=eks/${current_context#*cluster/}
   else
-    local cluster=$current_context
+    cluster=$current_context
   fi
-  # echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX} $(get_seperator)"
+
   echo "${ZSH_THEME_K8S_PREFIX}$cluster${ZSH_THEME_K8S_SUFFIX}"
 }
 
